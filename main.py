@@ -45,10 +45,10 @@ for mob in mob_types:
     mob_animations.append(animation_list)
 
 # Create character
-player = Character(100, 100, mob_animations, 0)
+player = Character(100, 100, 100, mob_animations, 0)
 
 # Create enemy
-enemy = Character(200, 300, mob_animations, 1)
+enemy = Character(200, 300, 100, mob_animations, 1)
 
 # Create player weapon
 bow = Weapon(bow_image, arrow_image)
