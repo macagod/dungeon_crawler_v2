@@ -1,0 +1,55 @@
+# Game settings
+FPS = 60
+
+# Screen settings   
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 600
+
+# Movement settings 
+SPEED = 3
+
+# Arrow settings
+ARROW_SPEED = 10
+
+# Color settings
+RED = (255, 0, 0)
+BG = (40, 25, 25)
+
+# Scaling settings
+SCALE = 3
+WEAPON_SCALE = 1.3
+
+OFFSET = 12
+
+# Sprint settings
+SPRINT_SPEED_BOOST = 2
+
+# Animation cooldowns (in milliseconds)
+ANIMATION_COOLDOWN_IDLE = 150
+ANIMATION_COOLDOWN_RUN = 100
+ANIMATION_COOLDOWN_SPRINT = 70
+
+# Stamina settings
+MAX_STAMINA = 100
+STAMINA_DEPLETION_RATE = 0.8  # Per frame
+STAMINA_REGEN_IDLE_RATE = 0.5  # Per frame
+STAMINA_REGEN_RUN_RATE = 0.2  # Per frame
+STAMINA_FONT_PATH = "assets/fonts/AtariClassic.ttf"
+STAMINA_FONT_SIZE = 24
+STAMINA_COLOR_FULL = (0, 255, 0)  # Green
+STAMINA_COLOR_SPRINTING = (255, 165, 0)  # Orange
+STAMINA_COLOR_REGENERATING = (255, 255, 0)  # Yellow
+STAMINA_COLOR_DEPLETED = (255, 0, 0)  # Red
+STAMINA_TEXT_PADDING = 10  # Pixels
+
+# Sprint Cooldown settings
+SPRINT_COOLDOWN_DURATION = 2000  # Milliseconds
+STAMINA_COLOR_COOLDOWN = (192, 192, 192)  # Silver
+
+# Regeneration Note settings
+REGEN_NOTE_TEXT = "Stamina regens faster when idle!"
+REGEN_NOTE_FONT_SIZE = 16
+REGEN_NOTE_COLOR = (255, 215, 0)  # Golden
+REGEN_NOTE_PADDING_BOTTOM = 10
+
+
