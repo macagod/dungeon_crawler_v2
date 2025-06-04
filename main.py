@@ -2,13 +2,15 @@ import pygame
 import random
 from character import Character
 from constants import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BG, SPEED, SCALE, WEAPON_SCALE, # Existing constants
+    SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BG, SPEED, SCALE, WEAPON_SCALE, PANEL, PANEL_BORDER, # Existing constants
     MAX_STAMINA, STAMINA_FONT_PATH, STAMINA_FONT_SIZE, STAMINA_TEXT_PADDING, # Stamina constants
     STAMINA_COLOR_COOLDOWN, # Cooldown color constant
     # Regeneration Note constants
     REGEN_NOTE_TEXT, REGEN_NOTE_FONT_SIZE, REGEN_NOTE_COLOR, REGEN_NOTE_PADDING_BOTTOM,
     # Damage text constants
-    DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE, DAMAGE_TEXT_COLOR
+    DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE, DAMAGE_TEXT_COLOR, 
+    # Item constants
+    ITEM_SCALE
 )
 from weapon import Weapon
 
@@ -25,6 +27,11 @@ def scale_image(image, scale):
     w = image.get_width()
     h = image.get_height()
     return pygame.transform.scale(image, (w * scale, h * scale))
+
+# Load heart images
+heart_empty = scale_image(pygame.image.load("assets/images/items/heart_empty.png").convert_alpha(), ITEM_SCALE)
+heart_half = scale_image(pygame.image.load("assets/images/items/heart_half.png").convert_alpha(), ITEM_SCALE)
+heart_full = scale_image(pygame.image.load("assets/images/items/heart_full.png").convert_alpha(), ITEM_SCALE)
 
 # Load weapon images
 bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), WEAPON_SCALE)
@@ -49,6 +56,22 @@ for mob in mob_types:
 
 # Define font
 damage_text_font = pygame.font.Font(DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE)
+
+# Function for displaying game info
+def draw_info():
+    # Draw panel
+    pygame.draw.rect(screen, PANEL, (0, 0, SCREEN_WIDTH, 60))
+    pygame.draw.line(screen, PANEL_BORDER, (0, 60), (SCREEN_WIDTH, 60), 2)
+    # Draw hearts
+    half_heart_drawn = False
+    for i in range(5):
+        if player.health >= ((i + 1) * 20):
+            screen.blit(heart_full, (10 + (i * (heart_full.get_width() + 5)), 10))
+        elif (player.health % 20) > 0 and not half_heart_drawn:
+            screen.blit(heart_half, (10 + (i * (heart_half.get_width() + 5)), 10))
+            half_heart_drawn = True
+        else:
+            screen.blit(heart_empty, (10 + (i * (heart_full.get_width() + 5)), 10))
 
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -93,7 +116,7 @@ class DamageText(pygame.sprite.Sprite):
 
 
 # Create character
-player = Character(100, 100, 100, mob_animations, 0)
+player = Character(100, 100, 70, mob_animations, 0)
 
 # Create enemy
 enemy = Character(200, 300, 100, mob_animations, 1)
@@ -147,9 +170,6 @@ while run:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), DAMAGE_TEXT_COLOR)
             damage_text_group.add(damage_text)
 
-    # Print enemy health
-    for enemy in enemy_list:
-        print(f"Enemy health: {enemy.health}")
     
     # Update damage text
     damage_text_group.update()
@@ -163,6 +183,7 @@ while run:
         enemy.draw(screen)
     # Draw damage text
     damage_text_group.draw(screen)
+    draw_info()
     # --- Draw Stamina UI ---
     # Main Stamina Text
     stamina_display_text = f"Stamina: {int(player.stamina)}/{MAX_STAMINA}"
@@ -178,7 +199,7 @@ while run:
         cooldown_text = f"Cooldown: {remaining_cooldown_seconds:.1f}s"
         cooldown_surface = stamina_font.render(cooldown_text, True, STAMINA_COLOR_COOLDOWN)
         cooldown_rect = cooldown_surface.get_rect()
-        cooldown_rect.topright = (SCREEN_WIDTH - STAMINA_TEXT_PADDING, stamina_rect.bottom + 5)
+        cooldown_rect.topright = (SCREEN_WIDTH - STAMINA_TEXT_PADDING, stamina_rect.bottom + 1)
         screen.blit(cooldown_surface, cooldown_rect)
 
     # --- Draw Regeneration Hint Note ---

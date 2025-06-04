@@ -4,6 +4,8 @@ FPS = 60
 # Screen settings   
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
+PANEL = (50, 50, 50)
+PANEL_BORDER = (255, 255, 255)
 
 # Movement settings 
 SPEED = 3
@@ -18,6 +20,7 @@ BG = (40, 25, 25)
 # Scaling settings
 SCALE = 3
 WEAPON_SCALE = 1.3
+ITEM_SCALE = 3
 
 OFFSET = 12
 
