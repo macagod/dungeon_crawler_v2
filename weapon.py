@@ -56,6 +56,8 @@ class Arrow(pygame.sprite.Sprite):
         self.dy = math.sin(math.radians(self.angle)) * ARROW_SPEED * -1 # PyGame uses inverted Y-axis
 
     def update(self, enemy_list):
+        damage = 0
+        damage_pos = None
         # Reposition based on velocity
         self.rect.x += self.dx
         self.rect.y += self.dy
@@ -66,12 +68,14 @@ class Arrow(pygame.sprite.Sprite):
 
         # Check collision between arrow and enemy
         for enemy in enemy_list:
-            if enemy.rect.colliderect(self.rect):
+            if enemy.rect.colliderect(self.rect) and enemy.is_alive:
                 print("Arrow hit enemy")
                 damage = 10 + random.randint(-5, 5)
+                damage_pos = enemy.rect
                 enemy.health -= damage
                 self.kill()
                 break
+        return damage, damage_pos
                 
         
 

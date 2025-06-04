@@ -17,6 +17,7 @@ class Character:
 
         # Health settings
         self.health = health
+        self.is_alive = True
         
         # Animation settings
         self.running = False
@@ -134,8 +135,16 @@ class Character:
             self.stamina_text_color = STAMINA_COLOR_FULL
         else: # Regenerating or partially full
             self.stamina_text_color = STAMINA_COLOR_REGENERATING
+
+    
     
     def update_animation(self):
+
+        # Check if character is alive
+        if self.health <= 0:
+            self.health = 0 
+            self.is_alive = False
+
         self.update_action(1) if self.running else self.update_action(0)
 
         is_effectively_sprinting = self.sprinting and self.stamina > 0

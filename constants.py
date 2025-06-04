@@ -24,6 +24,11 @@ OFFSET = 12
 # Sprint settings
 SPRINT_SPEED_BOOST = 2
 
+# Damage text settings
+DAMAGE_TEXT_FONT_PATH = "assets/fonts/AtariClassic.ttf"
+DAMAGE_TEXT_FONT_SIZE = 12
+DAMAGE_TEXT_COLOR = (255, 0, 0)
+
 # Animation cooldowns (in milliseconds)
 ANIMATION_COOLDOWN_IDLE = 150
 ANIMATION_COOLDOWN_RUN = 100

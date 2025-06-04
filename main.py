@@ -1,11 +1,14 @@
 import pygame
+import random
 from character import Character
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BG, SPEED, SCALE, WEAPON_SCALE, # Existing constants
     MAX_STAMINA, STAMINA_FONT_PATH, STAMINA_FONT_SIZE, STAMINA_TEXT_PADDING, # Stamina constants
     STAMINA_COLOR_COOLDOWN, # Cooldown color constant
     # Regeneration Note constants
-    REGEN_NOTE_TEXT, REGEN_NOTE_FONT_SIZE, REGEN_NOTE_COLOR, REGEN_NOTE_PADDING_BOTTOM 
+    REGEN_NOTE_TEXT, REGEN_NOTE_FONT_SIZE, REGEN_NOTE_COLOR, REGEN_NOTE_PADDING_BOTTOM,
+    # Damage text constants
+    DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE, DAMAGE_TEXT_COLOR
 )
 from weapon import Weapon
 
@@ -44,6 +47,51 @@ for mob in mob_types:
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
 
+# Define font
+damage_text_font = pygame.font.Font(DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE)
+
+# Damage text class
+class DamageText(pygame.sprite.Sprite):
+    def __init__(self, x, y, damage, color):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = damage_text_font.render(str(damage), True, DAMAGE_TEXT_COLOR)
+        self.rect = self.image.get_rect()
+        
+        # Add random initial offset
+        self.rect.centerx = x + random.randint(-10, 10)
+        self.rect.centery = y
+        
+        # Add random initial velocities
+        self.velocity_x = random.uniform(-0.5, 0.5)  # Random horizontal velocity
+        self.velocity_y = random.uniform(-2.0, -1.0)  # Random upward velocity
+        self.gravity = 0.1  # Gravity effect to create arc
+        
+        # Add random rotation
+        self.rotation = random.uniform(-2, 2)  # Reduced rotation range for less tilt
+        self.original_image = self.image
+        self.image = pygame.transform.rotate(self.original_image, self.rotation)
+        
+        # Fade settings
+        self.alpha = 255
+        self.fade_speed = random.uniform(6, 10)  # Increased fade speed for shorter visibility
+       
+    def update(self):
+        # Apply gravity to vertical velocity
+        self.velocity_y += self.gravity
+        
+        # Update position based on velocities
+        self.rect.x += self.velocity_x
+        self.rect.y += self.velocity_y
+        
+        # Fade out the damage text
+        self.alpha -= self.fade_speed
+        self.image.set_alpha(max(0, int(self.alpha)))
+        
+        # Remove the damage text when it's fully faded out
+        if self.alpha <= 0:
+            self.kill()
+
+
 # Create character
 player = Character(100, 100, 100, mob_animations, 0)
 
@@ -58,7 +106,9 @@ enemy_list = []
 enemy_list.append(enemy)
 
 # Create sprite groups
+damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
+
 # Load fonts
 stamina_font = pygame.font.Font(STAMINA_FONT_PATH, STAMINA_FONT_SIZE)
 regen_note_font = pygame.font.Font(STAMINA_FONT_PATH, REGEN_NOTE_FONT_SIZE) # Font for the regen note
@@ -92,14 +142,17 @@ while run:
     
     # Update arrows
     for arrow in arrow_group:
-        arrow.update(enemy_list)
+        damage, damage_pos = arrow.update(enemy_list)
+        if damage != 0:
+            damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), DAMAGE_TEXT_COLOR)
+            damage_text_group.add(damage_text)
 
     # Print enemy health
     for enemy in enemy_list:
         print(f"Enemy health: {enemy.health}")
     
-    
-    
+    # Update damage text
+    damage_text_group.update()
 
     # Draw character
     player.draw(screen)
@@ -108,6 +161,8 @@ while run:
         arrow.draw(screen)
     for enemy in enemy_list: # Draw enemies
         enemy.draw(screen)
+    # Draw damage text
+    damage_text_group.draw(screen)
     # --- Draw Stamina UI ---
     # Main Stamina Text
     stamina_display_text = f"Stamina: {int(player.stamina)}/{MAX_STAMINA}"
