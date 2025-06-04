@@ -92,9 +92,13 @@ while run:
     
     # Update arrows
     for arrow in arrow_group:
-        arrow.update()
+        arrow.update(enemy_list)
+
+    # Print enemy health
+    for enemy in enemy_list:
+        print(f"Enemy health: {enemy.health}")
     
-    print(arrow_group)
+    
     
 
     # Draw character
