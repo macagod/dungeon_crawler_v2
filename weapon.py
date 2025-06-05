@@ -58,7 +58,7 @@ class Arrow(pygame.sprite.Sprite):
     def update(self, enemy_list, screen_scroll):
         # Reposition based on screen scroll
         self.rect.x += screen_scroll[0]
-        self.rect.y += screen_scroll[1]
+        self.rect.y += screen_scroll[1] 
         damage = 0
         damage_pos = None
         # Reposition based on velocity

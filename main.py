@@ -108,6 +108,8 @@ def draw_info():
 
     # Draw score
     draw_text(f"{player.score}", score_font, WHITE, SCREEN_WIDTH - 695, 20)
+    # Draw Level
+    draw_text(f"Level: {level}", score_font, WHITE, 400, 20)
 
 # Create empty tile list
 world_data = []
@@ -275,10 +277,11 @@ while run:
     # Draw items
     item_group.draw(screen)
 
-    score_coin.draw(screen)
+   
 
     # Draw info
     draw_info() 
+    score_coin.draw(screen) # Draw score coin
     # --- Draw Stamina UI ---
     # Main Stamina Text
     stamina_display_text = f"Stamina: {int(player.stamina)}/{MAX_STAMINA}"
