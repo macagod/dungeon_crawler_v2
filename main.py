@@ -168,10 +168,10 @@ class DamageText(pygame.sprite.Sprite):
 
 
 # Create character
-player = Character(100, 100, 70, mob_animations, 0)
+player = Character(100, 100, mob_animations, 0)
 
 # Create enemy
-enemy = Character(200, 300, 100, mob_animations, 1)
+enemy = Character(200, 300, mob_animations, 1)
 
 # Create player weapon
 bow = Weapon(bow_image, arrow_image)
@@ -255,18 +255,6 @@ while run:
         arrow.draw(screen)
     for enemy in enemy_list: # Draw enemies
         enemy.draw(screen)
-    # Draw damage text
-    damage_text_group.draw(screen)
-
-    # Draw items
-    item_group.draw(screen)
-
-    # Draw info
-    draw_info()
-
-    score_coin.draw(screen)
-
-
     # --- Draw Stamina UI ---
     # Main Stamina Text
     stamina_display_text = f"Stamina: {int(player.stamina)}/{MAX_STAMINA}"
