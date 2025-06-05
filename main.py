@@ -208,7 +208,12 @@ while run:
     # Clear screen
     screen.fill(BG)
 
+    # Draw info
     draw_info()
+
+    # Draw damage text
+    damage_text_group.draw(screen)
+
     
     # Calculate player movement
     dx, dy = player.get_movement(SPEED)
