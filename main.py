@@ -228,7 +228,7 @@ while run:
     # Calculate player movement
     dx, dy = player.get_movement(SPEED)
     screen_scroll = player.move(dx, dy)
-    print(screen_scroll)
+ 
 
     # Update world
     world.update(screen_scroll)
