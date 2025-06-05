@@ -4,14 +4,14 @@ from constants import (
     ANIMATION_COOLDOWN_IDLE, ANIMATION_COOLDOWN_RUN, ANIMATION_COOLDOWN_SPRINT,
     MAX_STAMINA, STAMINA_DEPLETION_RATE, STAMINA_REGEN_IDLE_RATE, STAMINA_REGEN_RUN_RATE,
     STAMINA_COLOR_FULL, STAMINA_COLOR_SPRINTING, STAMINA_COLOR_REGENERATING, STAMINA_COLOR_DEPLETED,
-    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN # New constants
+    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE # New constants
 )
 import math
 
 class Character:
     def __init__(self, x, y, health, mob_animations, char_type):
         self.flip = False
-        self.rect = pygame.Rect(0, 0, 40, 40)
+        self.rect = pygame.Rect(0, 0, TILE_SIZE, 40)
         self.rect.center = (x, y)
         self.char_type = char_type
 

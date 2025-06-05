@@ -2,7 +2,7 @@ import pygame
 import random
 from character import Character
 from constants import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BG, SPEED, SCALE, WEAPON_SCALE, PANEL, PANEL_BORDER, WHITE,# Existing constants
+    SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BG, SPEED, SCALE, WEAPON_SCALE, PANEL, PANEL_BORDER, WHITE, TILE_SIZE, TILE_TYPES, # Existing constants
     MAX_STAMINA, STAMINA_FONT_PATH, STAMINA_FONT_SIZE, STAMINA_TEXT_PADDING, # Stamina constants
     STAMINA_COLOR_COOLDOWN, # Cooldown color constant
     # Regeneration Note constants
@@ -14,7 +14,7 @@ from constants import (
 )
 from weapon import Weapon
 from items import Item
-
+from world import World
 pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -47,6 +47,13 @@ potion_image = scale_image(pygame.image.load("assets/images/items/potion_red.png
 bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), WEAPON_SCALE)
 arrow_image = scale_image(pygame.image.load("assets/images/weapons/arrow.png").convert_alpha(), WEAPON_SCALE)
 
+# Load tile images
+tile_list = []
+for i in range(TILE_TYPES):
+    tile_image = pygame.image.load(f"assets/images/tiles/{i}.png").convert_alpha()
+    tile_image = pygame.transform.scale(tile_image, (TILE_SIZE, TILE_SIZE))
+    tile_list.append(tile_image)
+
 # Load character images
 mob_animations = []
 mob_types = ["elf", "imp", "skeleton", "goblin", "muddy", "tiny_zombie", "big_demon"]
@@ -74,6 +81,8 @@ def draw_text(text, font, text_col, x, y):
 
 # Function for displaying game info
 def draw_info():
+
+
     # Draw panel
     pygame.draw.rect(screen, PANEL, (0, 0, SCREEN_WIDTH, 60))
     pygame.draw.line(screen, PANEL_BORDER, (0, 60), (SCREEN_WIDTH, 60), 2)
@@ -90,6 +99,26 @@ def draw_info():
 
     # Draw score
     draw_text(f"{player.score}", score_font, WHITE, SCREEN_WIDTH - 695, 20)
+
+
+world_data = [
+              [7, 7, 7, 7, 7 , 7, 7, 7, 7, 7],
+              [7, 0, 1, 2, 3, 4, 5, 6, 7, 7],
+              [7, 3, 4, 5, 6, 7, 6, 5, 4, 7],
+              [7, 6, 7, 6, 5, 4, 5, 6, 7, 7],
+              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
+              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
+              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
+              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
+              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
+              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
+              
+]
+
+# Create world object
+world = World()
+world.process_data(world_data, tile_list)
+
 
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -173,6 +202,8 @@ while run:
 
     # Clear screen
     screen.fill(BG)
+
+
     
     # Calculate player movement
     dx, dy = player.get_movement(SPEED)
@@ -208,6 +239,9 @@ while run:
 
     # Update HUD coin
     score_coin.update()
+
+    # Draw world
+    world.draw(screen)
 
     # Draw character
     player.draw(screen)
