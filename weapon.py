@@ -55,7 +55,10 @@ class Arrow(pygame.sprite.Sprite):
         self.dx = math.cos(math.radians(self.angle)) * ARROW_SPEED
         self.dy = math.sin(math.radians(self.angle)) * ARROW_SPEED * -1 # PyGame uses inverted Y-axis
 
-    def update(self, enemy_list):
+    def update(self, enemy_list, screen_scroll):
+        # Reposition based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
         damage = 0
         damage_pos = None
         # Reposition based on velocity

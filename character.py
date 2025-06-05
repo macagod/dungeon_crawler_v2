@@ -128,6 +128,11 @@ class Character:
 
         return screen_scroll
 
+    def ai(self, screen_scroll):
+        # Reposition mobs based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+
     def update_stamina(self):
         # 1. Update Cooldown Status
         if self.sprint_cooldown_active and pygame.time.get_ticks() >= self.sprint_cooldown_end_time:

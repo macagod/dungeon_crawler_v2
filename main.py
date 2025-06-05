@@ -131,6 +131,7 @@ world.process_data(world_data, tile_list)
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
     def __init__(self, x, y, damage, color):
+        
         pygame.sprite.Sprite.__init__(self)
         self.image = damage_text_font.render(str(damage), True, DAMAGE_TEXT_COLOR)
         self.rect = self.image.get_rect()
@@ -153,7 +154,10 @@ class DamageText(pygame.sprite.Sprite):
         self.alpha = 255
         self.fade_speed = random.uniform(6, 10)  # Increased fade speed for shorter visibility
        
-    def update(self):
+    def update(self, screen_scroll):
+        # Reposition damage text based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
         # Apply gravity to vertical velocity
         self.velocity_y += self.gravity
         
@@ -213,8 +217,7 @@ while run:
     # Draw world
     world.draw(screen)
 
-    # Draw info
-    draw_info()
+    
 
     # Draw damage text
     damage_text_group.draw(screen)
@@ -229,6 +232,7 @@ while run:
     world.update(screen_scroll)
     # Update enemy
     for enemy in enemy_list:
+        enemy.ai(screen_scroll)
         enemy.update_animation()
     # Update stamina
     player.update_stamina()
@@ -243,14 +247,14 @@ while run:
     
     # Update arrows
     for arrow in arrow_group:
-        damage, damage_pos = arrow.update(enemy_list)
+        damage, damage_pos = arrow.update(enemy_list, screen_scroll)
         if damage != 0:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), DAMAGE_TEXT_COLOR)
             damage_text_group.add(damage_text)
 
     
     # Update damage text
-    damage_text_group.update()
+    damage_text_group.update(screen_scroll)
 
     # Update collectable items
     item_group.update(screen_scroll, player)
@@ -272,6 +276,9 @@ while run:
     item_group.draw(screen)
 
     score_coin.draw(screen)
+
+    # Draw info
+    draw_info() 
     # --- Draw Stamina UI ---
     # Main Stamina Text
     stamina_display_text = f"Stamina: {int(player.stamina)}/{MAX_STAMINA}"
