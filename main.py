@@ -2,7 +2,7 @@ import pygame
 import random
 from character import Character
 from constants import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BG, SPEED, SCALE, WEAPON_SCALE, PANEL, PANEL_BORDER, # Existing constants
+    SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BG, SPEED, SCALE, WEAPON_SCALE, PANEL, PANEL_BORDER, WHITE,# Existing constants
     MAX_STAMINA, STAMINA_FONT_PATH, STAMINA_FONT_SIZE, STAMINA_TEXT_PADDING, # Stamina constants
     STAMINA_COLOR_COOLDOWN, # Cooldown color constant
     # Regeneration Note constants
@@ -10,9 +10,10 @@ from constants import (
     # Damage text constants
     DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE, DAMAGE_TEXT_COLOR, 
     # Item constants
-    ITEM_SCALE
+    ITEM_SCALE, POTION_SCALE
 )
 from weapon import Weapon
+from items import Item
 
 pygame.init()
 
@@ -23,15 +24,24 @@ pygame.display.set_caption("Dungeon Crawler")
 clock = pygame.time.Clock()
 
 # Helper function to scale images
-def scale_image(image, scale):
+def scale_image(image, scale_factor):
     w = image.get_width()
     h = image.get_height()
-    return pygame.transform.scale(image, (w * scale, h * scale))
+    return pygame.transform.scale(image, (int(w * scale_factor), int(h * scale_factor)))
 
 # Load heart images
 heart_empty = scale_image(pygame.image.load("assets/images/items/heart_empty.png").convert_alpha(), ITEM_SCALE)
 heart_half = scale_image(pygame.image.load("assets/images/items/heart_half.png").convert_alpha(), ITEM_SCALE)
 heart_full = scale_image(pygame.image.load("assets/images/items/heart_full.png").convert_alpha(), ITEM_SCALE)
+
+# Load coin images
+coin_images = []
+for i in range(4):
+    img = scale_image(pygame.image.load(f"assets/images/items/coin_f{i}.png").convert_alpha(), ITEM_SCALE)
+    coin_images.append(img)
+
+# Load potion image
+potion_image = scale_image(pygame.image.load("assets/images/items/potion_red.png").convert_alpha(), POTION_SCALE)
 
 # Load weapon images
 bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), WEAPON_SCALE)
@@ -56,6 +66,11 @@ for mob in mob_types:
 
 # Define font
 damage_text_font = pygame.font.Font(DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE)
+score_font = pygame.font.Font(STAMINA_FONT_PATH, 24)
+# Function to output text to the screen
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
 
 # Function for displaying game info
 def draw_info():
@@ -72,6 +87,9 @@ def draw_info():
             half_heart_drawn = True
         else:
             screen.blit(heart_empty, (10 + (i * (heart_full.get_width() + 5)), 10))
+
+    # Draw score
+    draw_text(f"{player.score}", score_font, WHITE, SCREEN_WIDTH - 695, 20)
 
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -131,6 +149,17 @@ enemy_list.append(enemy)
 # Create sprite groups
 damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
+item_group = pygame.sprite.Group()
+
+score_coin = Item(SCREEN_WIDTH - 710, 30, -1, coin_images)
+item_group.add(score_coin)
+
+potion = Item(200, 200, 1, [potion_image])
+item_group.add(potion)
+
+coin = Item(400, 400, 0, coin_images)
+item_group.add(coin)
+
 
 # Load fonts
 stamina_font = pygame.font.Font(STAMINA_FONT_PATH, STAMINA_FONT_SIZE)
@@ -174,6 +203,12 @@ while run:
     # Update damage text
     damage_text_group.update()
 
+    # Update collectable items
+    item_group.update(player)
+
+    # Update HUD coin
+    score_coin.update()
+
     # Draw character
     player.draw(screen)
     bow.draw(screen)
@@ -183,7 +218,16 @@ while run:
         enemy.draw(screen)
     # Draw damage text
     damage_text_group.draw(screen)
+
+    # Draw items
+    item_group.draw(screen)
+
+    # Draw info
     draw_info()
+
+    score_coin.draw(screen)
+
+
     # --- Draw Stamina UI ---
     # Main Stamina Text
     stamina_display_text = f"Stamina: {int(player.stamina)}/{MAX_STAMINA}"

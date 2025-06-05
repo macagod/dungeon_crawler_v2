@@ -15,6 +15,9 @@ class Character:
         self.rect.center = (x, y)
         self.char_type = char_type
 
+        # Item settings
+        self.score = 0
+
         # Health settings
         self.health = health
         self.is_alive = True

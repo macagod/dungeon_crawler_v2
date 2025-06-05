@@ -16,11 +16,13 @@ ARROW_SPEED = 10
 # Color settings
 RED = (255, 0, 0)
 BG = (40, 25, 25)
+WHITE = (255, 255, 255)
 
 # Scaling settings
 SCALE = 3
 WEAPON_SCALE = 1.3
 ITEM_SCALE = 3
+POTION_SCALE = 2
 
 OFFSET = 12
 
