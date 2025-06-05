@@ -29,6 +29,8 @@ OFFSET = 12
 # Tile settings
 TILE_SIZE = 16 * SCALE
 TILE_TYPES = 18
+ROWS = 150
+COLS = 150
 
 # Sprint settings
 SPRINT_SPEED_BOOST = 2

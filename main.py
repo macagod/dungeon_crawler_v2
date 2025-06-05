@@ -10,11 +10,14 @@ from constants import (
     # Damage text constants
     DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE, DAMAGE_TEXT_COLOR, 
     # Item constants
-    ITEM_SCALE, POTION_SCALE
+    ITEM_SCALE, POTION_SCALE,
+    # World constants
+    ROWS, COLS,
 )
 from weapon import Weapon
 from items import Item
 from world import World
+import csv
 pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -22,6 +25,9 @@ pygame.display.set_caption("Dungeon Crawler")
 
 # Create clock for maintaining a consistent frame rate
 clock = pygame.time.Clock()
+
+# Define game variables
+level = 1
 
 # Helper function to scale images
 def scale_image(image, scale_factor):
@@ -100,20 +106,19 @@ def draw_info():
     # Draw score
     draw_text(f"{player.score}", score_font, WHITE, SCREEN_WIDTH - 695, 20)
 
+# Create empty tile list
+world_data = []
+for row in range(ROWS):
+    r = [-1] * COLS
+    world_data.append(r)
 
-world_data = [
-              [7, 7, 7, 7, 7 , 7, 7, 7, 7, 7],
-              [7, 0, 1, 2, 3, 4, 5, 6, 7, 7],
-              [7, 3, 4, 5, 6, 7, 6, 5, 4, 7],
-              [7, 6, 7, 6, 5, 4, 5, 6, 7, 7],
-              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
-              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
-              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
-              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
-              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
-              [7, 7, 7, 7, 0, 0, 0, 7, 7, 7],
-              
-]
+# Load in level data
+with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+    reader = csv.reader(csvfile, delimiter=",")
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            world_data[x][y] = int(tile)
+
 
 # Create world object
 world = World()
