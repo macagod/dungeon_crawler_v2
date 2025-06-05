@@ -13,6 +13,8 @@ from constants import (
     ITEM_SCALE, POTION_SCALE,
     # World constants
     ROWS, COLS,
+    # Screen scroll constants
+    SCROLL_THRESH,
 )
 from weapon import Weapon
 from items import Item
@@ -28,6 +30,7 @@ clock = pygame.time.Clock()
 
 # Define game variables
 level = 1
+screen_scroll = [0, 0]
 
 # Helper function to scale images
 def scale_image(image, scale_factor):
@@ -168,7 +171,7 @@ class DamageText(pygame.sprite.Sprite):
 
 
 # Create character
-player = Character(100, 100, 100, mob_animations, 0)
+player = Character(400, 300, 100, mob_animations, 0)
 
 # Create enemy
 enemy = Character(200, 300, 100, mob_animations, 1)
@@ -207,6 +210,8 @@ while run:
 
     # Clear screen
     screen.fill(BG)
+    # Draw world
+    world.draw(screen)
 
     # Draw info
     draw_info()
@@ -217,8 +222,11 @@ while run:
     
     # Calculate player movement
     dx, dy = player.get_movement(SPEED)
-    player.move(dx, dy)
+    screen_scroll = player.move(dx, dy)
+    print(screen_scroll)
 
+    # Update world
+    world.update(screen_scroll)
     # Update enemy
     for enemy in enemy_list:
         enemy.update_animation()
@@ -245,21 +253,23 @@ while run:
     damage_text_group.update()
 
     # Update collectable items
-    item_group.update(player)
+    item_group.update(screen_scroll, player)
 
     # Update HUD coin
     score_coin.update()
 
-    # Draw world
-    world.draw(screen)
+   
 
-    # Draw character
+    # Draw characters
     player.draw(screen)
     bow.draw(screen)
     for arrow in arrow_group: # Draw arrows
         arrow.draw(screen)
     for enemy in enemy_list: # Draw enemies
         enemy.draw(screen)
+    
+    # Draw items
+    item_group.draw(screen)
 
     score_coin.draw(screen)
     # --- Draw Stamina UI ---

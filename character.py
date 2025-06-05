@@ -4,7 +4,7 @@ from constants import (
     ANIMATION_COOLDOWN_IDLE, ANIMATION_COOLDOWN_RUN, ANIMATION_COOLDOWN_SPRINT,
     MAX_STAMINA, STAMINA_DEPLETION_RATE, STAMINA_REGEN_IDLE_RATE, STAMINA_REGEN_RUN_RATE,
     STAMINA_COLOR_FULL, STAMINA_COLOR_SPRINTING, STAMINA_COLOR_REGENERATING, STAMINA_COLOR_DEPLETED,
-    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE # New constants
+    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE, SCREEN_WIDTH, SCROLL_THRESH, SCREEN_HEIGHT # New constants
 )
 import math
 
@@ -94,6 +94,10 @@ class Character:
         return dx, dy
 
     def move(self, dx, dy):
+        # Screen scroll
+        screen_scroll = [0, 0]
+
+
         self.running = False
         if dx != 0 or dy != 0:
             self.running = True
@@ -103,6 +107,26 @@ class Character:
             self.flip = False
         self.rect.x += dx
         self.rect.y += dy
+
+        # Scroll logic only applies to player
+        if self.char_type == 0:
+            # Update scroll based on player position
+            # Move camera left and right
+            if self.rect.right > SCREEN_WIDTH - SCROLL_THRESH:
+                screen_scroll[0] = (SCREEN_WIDTH - SCROLL_THRESH) - self.rect.right
+                self.rect.right = SCREEN_WIDTH - SCROLL_THRESH
+            if self.rect.left < SCROLL_THRESH:
+                screen_scroll[0] = SCROLL_THRESH - self.rect.left
+                self.rect.left = SCROLL_THRESH
+            # Move camera up and down
+            if self.rect.bottom > SCREEN_HEIGHT - SCROLL_THRESH:
+                screen_scroll[1] = (SCREEN_HEIGHT - SCROLL_THRESH) - self.rect.bottom
+                self.rect.bottom = SCREEN_HEIGHT - SCROLL_THRESH
+            if self.rect.top < SCROLL_THRESH:
+                screen_scroll[1] = SCROLL_THRESH - self.rect.top
+                self.rect.top = SCROLL_THRESH
+
+        return screen_scroll
 
     def update_stamina(self):
         # 1. Update Cooldown Status

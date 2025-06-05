@@ -22,6 +22,13 @@ class World():
                 # Add image data to main tiles list
                 if tile >= 0:
                     self.map_tiles.append(tile_data)
+
+    def update(self, screen_scroll):
+        # Update tile positions based on screen scroll
+        for tile in self.map_tiles:
+            tile[2] += screen_scroll[0]
+            tile[3] += screen_scroll[1]
+            tile[1].center = (tile[2], tile[3])
                 
     def draw(self, surface):
         for tile in self.map_tiles:

@@ -32,6 +32,9 @@ TILE_TYPES = 18
 ROWS = 150
 COLS = 150
 
+# Screen scroll settings
+SCROLL_THRESH = 200
+
 # Sprint settings
 SPRINT_SPEED_BOOST = 2
 

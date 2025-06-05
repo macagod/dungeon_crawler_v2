@@ -11,7 +11,11 @@ class Item(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
-    def update(self, player=None):
+    def update(self, screen_scroll=None, player=None):
+        # Reposition item based on screen scroll, but not for HUD items like score_coin (item_type == -1)
+        if screen_scroll and self.item_type != -1:
+            self.rect.x += screen_scroll[0]
+            self.rect.y += screen_scroll[1]
         # Check if item overlaps with player
         if player and self.rect.colliderect(player.rect):
             # Item is coin
