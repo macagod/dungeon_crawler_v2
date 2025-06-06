@@ -9,6 +9,7 @@ PANEL_BORDER = (255, 255, 255)
 
 # Movement settings 
 SPEED = 3
+ENEMY_SPEED = 2
 
 # Arrow settings
 ARROW_SPEED = 9

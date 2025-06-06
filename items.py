@@ -1,10 +1,13 @@
 import pygame
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self, x, y, item_type, animation_list):
+    def __init__(self, x, y, item_type, animation_list ):
         pygame.sprite.Sprite.__init__(self)
         self.item_type = item_type
-        self.animation_list = animation_list
+        if not isinstance(animation_list, list):  # If animation list is provided, use it
+            self.animation_list = [animation_list]
+        else:
+            self.animation_list = animation_list
         self.frame_index = 0
         self.update_time = pygame.time.get_ticks()
         self.image = self.animation_list[self.frame_index]

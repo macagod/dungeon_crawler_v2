@@ -4,14 +4,18 @@ from constants import (
     ANIMATION_COOLDOWN_IDLE, ANIMATION_COOLDOWN_RUN, ANIMATION_COOLDOWN_SPRINT,
     MAX_STAMINA, STAMINA_DEPLETION_RATE, STAMINA_REGEN_IDLE_RATE, STAMINA_REGEN_RUN_RATE,
     STAMINA_COLOR_FULL, STAMINA_COLOR_SPRINTING, STAMINA_COLOR_REGENERATING, STAMINA_COLOR_DEPLETED,
-    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE, SCREEN_WIDTH, SCROLL_THRESH, SCREEN_HEIGHT # New constants
+    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE, SCREEN_WIDTH, SCROLL_THRESH, SCREEN_HEIGHT, ENEMY_SPEED # New constants
 )
 import math
 
 class Character:
-    def __init__(self, x, y, health, mob_animations, char_type):
+    def __init__(self, x, y, health, mob_animations, char_type, size, boss = False):
+        # Boss settings
+        self.boss = boss
+        
+        self.size = size
         self.flip = False
-        self.rect = pygame.Rect(0, 0, TILE_SIZE, 40)
+        self.rect = pygame.Rect(0, 0, TILE_SIZE * size, TILE_SIZE * size)
         self.rect.center = (x, y)
         self.char_type = char_type
 
@@ -93,11 +97,9 @@ class Character:
             dy *= (math.sqrt(2) / 2)
         return dx, dy
 
-    def move(self, dx, dy):
+    def move(self, dx, dy, obstacle_tiles):
         # Screen scroll
         screen_scroll = [0, 0]
-
-
         self.running = False
         if dx != 0 or dy != 0:
             self.running = True
@@ -105,8 +107,26 @@ class Character:
             self.flip = True
         elif dx > 0:
             self.flip = False
+        
+       
+
+        # Check for collisions with obstacle tiles
         self.rect.x += dx
+        for obstacle in obstacle_tiles:
+            if obstacle[1].colliderect(self.rect):
+                # Check which side of the obstacle the character is colliding with
+                if dx > 0:
+                    self.rect.right = obstacle[1].left
+                if dx < 0:
+                    self.rect.left = obstacle[1].right
+        
         self.rect.y += dy
+        for obstacle in obstacle_tiles:
+            if obstacle[1].colliderect(self.rect):
+                if dy > 0:
+                    self.rect.bottom = obstacle[1].top
+                if dy < 0:
+                    self.rect.top = obstacle[1].bottom
 
         # Scroll logic only applies to player
         if self.char_type == 0:
@@ -128,10 +148,22 @@ class Character:
 
         return screen_scroll
 
-    def ai(self, screen_scroll):
+    def ai(self, player, obstacle_tiles, screen_scroll):
+        ai_dx = 0
+        ai_dy = 0
         # Reposition mobs based on screen scroll
         self.rect.x += screen_scroll[0]
         self.rect.y += screen_scroll[1]
+
+        if self.rect.centerx > player.rect.centerx:
+            ai_dx = -ENEMY_SPEED
+        if self.rect.centerx < player.rect.centerx:
+            ai_dx = ENEMY_SPEED
+        if self.rect.centery > player.rect.centery:
+            ai_dy = -ENEMY_SPEED
+        if self.rect.centery < player.rect.centery:
+            ai_dy = ENEMY_SPEED
+        self.move(ai_dx, ai_dy, obstacle_tiles)
 
     def update_stamina(self):
         # 1. Update Cooldown Status
