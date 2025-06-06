@@ -306,7 +306,7 @@ while run:
         cooldown_rect.topright = (SCREEN_WIDTH - STAMINA_TEXT_PADDING, stamina_rect.bottom + 1)
         screen.blit(cooldown_surface, cooldown_rect)
 
-    # --- Draw Regeneration Hint Note ---
+    # --- Draw Regeneration Hint Nodte ---
     # Conditions to display the note:
     # 1. Stamina is regenerating (not full, not zero)
     # 2. Player is running (not idle)
