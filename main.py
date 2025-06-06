@@ -52,6 +52,11 @@ for i in range(4):
 # Load potion image
 potion_image = scale_image(pygame.image.load("assets/images/items/potion_red.png").convert_alpha(), POTION_SCALE)
 
+# Combine item images
+item_images = []
+item_images.append(coin_images)
+item_images.append(potion_image)
+
 # Load weapon images
 bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), WEAPON_SCALE)
 arrow_image = scale_image(pygame.image.load("assets/images/weapons/arrow.png").convert_alpha(), WEAPON_SCALE)
@@ -74,8 +79,8 @@ for mob in mob_types:
         # Reset temporary list of images
         temp_list = []
         for i in range(4):
-            image = pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha()
-            image = scale_image(image, SCALE)
+            images = pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha()
+            image = scale_image(images, SCALE)
             temp_list.append(image)
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
@@ -127,8 +132,10 @@ with open(f"levels/level{level}_data.csv", newline="") as csvfile:
 
 # Create world object
 world = World()
-world.process_data(world_data, tile_list)
+world.process_data(world_data, tile_list, item_images, mob_animations)
 
+# create player
+player = world.player
 
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -176,18 +183,11 @@ class DamageText(pygame.sprite.Sprite):
             self.kill()
 
 
-# Create character
-player = Character(400, 300, 100, mob_animations, 0)
-
-# Create enemy
-enemy = Character(200, 300, 100, mob_animations, 1)
 
 # Create player weapon
 bow = Weapon(bow_image, arrow_image)
 
-# Create empty enemy list
-enemy_list = []
-enemy_list.append(enemy)
+
 
 # Create sprite groups
 damage_text_group = pygame.sprite.Group()
@@ -197,11 +197,17 @@ item_group = pygame.sprite.Group()
 score_coin = Item(SCREEN_WIDTH - 710, 30, -1, coin_images)
 item_group.add(score_coin)
 
-potion = Item(200, 200, 1, [potion_image])
-item_group.add(potion)
+# Add items from level data
+for item in world.item_list:
+    item_group.add(item)
 
-coin = Item(400, 400, 0, coin_images)
-item_group.add(coin)
+enemy_list = []
+# Add enemies from level data
+enemy_list.extend(world.enemy_list)
+
+
+
+
 
 
 # Load fonts
