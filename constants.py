@@ -11,7 +11,7 @@ PANEL_BORDER = (255, 255, 255)
 SPEED = 3
 
 # Arrow settings
-ARROW_SPEED = 10
+ARROW_SPEED = 9
 
 # Color settings
 RED = (255, 0, 0)

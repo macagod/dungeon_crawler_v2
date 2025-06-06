@@ -57,13 +57,13 @@ class Arrow(pygame.sprite.Sprite):
 
     def update(self, enemy_list, screen_scroll):
         # Reposition based on screen scroll
-        self.rect.x += screen_scroll[0]
-        self.rect.y += screen_scroll[1] 
+        self.rect.x += screen_scroll[0] + self.dx
+        self.rect.y += screen_scroll[1] + self.dy
         damage = 0
         damage_pos = None
         # Reposition based on velocity
-        self.rect.x += self.dx
-        self.rect.y += self.dy
+        # self.rect.x += self.dx
+        # self.rect.y += self.dy
 
         # Check if arrow is off screen
         if self.rect.x < 0 or self.rect.x > SCREEN_WIDTH or self.rect.y < 0 or self.rect.y > SCREEN_HEIGHT:
