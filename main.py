@@ -29,9 +29,9 @@ pygame.display.set_caption("Dungeon Crawler")
 clock = pygame.time.Clock()
 
 # Define game variables
-level = 1
+level = 3
 screen_scroll = [0, 0]
-
+ 
 # Helper function to scale images
 def scale_image(image, scale_factor):
     w = image.get_width()
@@ -233,7 +233,7 @@ while run:
     
     # Calculate player movement
     dx, dy = player.get_movement(SPEED)
-    screen_scroll = player.move(dx, dy)
+    screen_scroll = player.move(dx, dy, world.obstacle_tiles)
  
 
     # Update world

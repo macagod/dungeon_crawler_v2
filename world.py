@@ -40,16 +40,20 @@ class World():
                 elif tile == 11: # Player
                     # This sets the player's position from the map.
                     # The main game loop should use this `world.player` instance.
-                    self.player = Character(image_x, image_y, 100, mob_animations, 0)
+                    self.player = Character(image_x, image_y, 100, mob_animations, 0, size = 1)
                     is_entity_tile = True
-                elif 12 <= tile <= 18: # Enemies
+                elif 12 <= tile <= 16: # Enemies
                     enemy_type = tile - 11  # Tile 12 -> type 1 ("imp"), etc.
                     # Safeguard to prevent crashing if tile number is out of range.
                     if enemy_type < len(mob_animations):
-                        enemy = Character(image_x, image_y, 100, mob_animations, enemy_type)
+                        enemy = Character(image_x, image_y, 100, mob_animations, enemy_type, size = 1)
                         self.enemy_list.append(enemy)
                     else:
                         print(f"Warning: Tile {tile} has an invalid enemy type and will be ignored.")
+                    is_entity_tile = True
+                elif tile == 17: # Boss
+                    enemy = Character(image_x, image_y, 100, mob_animations, 6, size = 2, boss = True)
+                    self.enemy_list.append(enemy)
                     is_entity_tile = True
                 
                 # If the tile was an entity (item, player, enemy), replace it with a floor tile.
