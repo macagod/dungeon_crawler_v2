@@ -178,6 +178,14 @@ class Character:
                 ai_dy = ENEMY_SPEED
         self.move(ai_dx, ai_dy, obstacle_tiles)
 
+        # If enemy is within range, attack player
+        if dist < ENEMY_RANGE and not self.hit and pygame.time.get_ticks() - self.last_hit > 1000:
+            self.hit = False
+            self.last_hit = pygame.time.get_ticks()
+            player.health -= 10
+            player.hit = True
+            player.last_hit = pygame.time.get_ticks()
+
     def update_stamina(self):
         # 1. Update Cooldown Status
         if self.sprint_cooldown_active and pygame.time.get_ticks() >= self.sprint_cooldown_end_time:
