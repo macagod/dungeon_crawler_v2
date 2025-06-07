@@ -4,7 +4,7 @@ from constants import (
     ANIMATION_COOLDOWN_IDLE, ANIMATION_COOLDOWN_RUN, ANIMATION_COOLDOWN_SPRINT,
     MAX_STAMINA, STAMINA_DEPLETION_RATE, STAMINA_REGEN_IDLE_RATE, STAMINA_REGEN_RUN_RATE,
     STAMINA_COLOR_FULL, STAMINA_COLOR_SPRINTING, STAMINA_COLOR_REGENERATING, STAMINA_COLOR_DEPLETED,
-    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE, SCREEN_WIDTH, SCROLL_THRESH, SCREEN_HEIGHT, ENEMY_SPEED # New constants
+    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE, SCREEN_WIDTH, SCROLL_THRESH, SCREEN_HEIGHT, ENEMY_SPEED, ENEMY_RANGE # New constants
 )
 import math
 
@@ -149,20 +149,33 @@ class Character:
         return screen_scroll
 
     def ai(self, player, obstacle_tiles, screen_scroll):
+        clipped_line = ()
         ai_dx = 0
         ai_dy = 0
         # Reposition mobs based on screen scroll
         self.rect.x += screen_scroll[0]
         self.rect.y += screen_scroll[1]
 
-        if self.rect.centerx > player.rect.centerx:
-            ai_dx = -ENEMY_SPEED
-        if self.rect.centerx < player.rect.centerx:
-            ai_dx = ENEMY_SPEED
-        if self.rect.centery > player.rect.centery:
-            ai_dy = -ENEMY_SPEED
-        if self.rect.centery < player.rect.centery:
-            ai_dy = ENEMY_SPEED
+        # Create Enemy Line of Sight
+        line_of_sight = ((self.rect.centerx, self.rect.centery), (player.rect.centerx, player.rect.centery))
+        
+        # Check if line of sight is obstructed by obstacle tiles
+        for obstacle in obstacle_tiles:
+            if obstacle[1].clipline(line_of_sight):
+                clipped_line = obstacle[1].clipline(line_of_sight)
+                
+        
+        # Check if player is within range
+        dist = math.sqrt(((self.rect.centerx - player.rect.centerx)**2 + (self.rect.centery - player.rect.centery)**2))
+        if not clipped_line and dist > ENEMY_RANGE:
+            if self.rect.centerx > player.rect.centerx:
+                ai_dx = -ENEMY_SPEED
+            if self.rect.centerx < player.rect.centerx:
+                ai_dx = ENEMY_SPEED
+            if self.rect.centery > player.rect.centery:
+                ai_dy = -ENEMY_SPEED
+            if self.rect.centery < player.rect.centery:
+                ai_dy = ENEMY_SPEED
         self.move(ai_dx, ai_dy, obstacle_tiles)
 
     def update_stamina(self):
