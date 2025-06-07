@@ -49,6 +49,7 @@ DAMAGE_TEXT_COLOR = (255, 0, 0)
 ANIMATION_COOLDOWN_IDLE = 150
 ANIMATION_COOLDOWN_RUN = 100
 ANIMATION_COOLDOWN_SPRINT = 70
+ATTACK_DIRECTION_COOLDOWN = 250 # Time to lock player facing direction after attacking
 
 # Stamina settings
 MAX_STAMINA = 100
@@ -76,5 +77,7 @@ REGEN_NOTE_PADDING_BOTTOM = 10
 # UI Feedback settings
 HEART_WIGGLE_DURATION = 300  # Milliseconds
 HEART_WIGGLE_STRENGTH = 4  # Pixels of maximum offset
+PLAYER_FLASH_DURATION = 200  # Milliseconds
+PLAYER_FLASH_COLOR = (255, 0, 0) # Red
 
 

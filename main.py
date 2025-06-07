@@ -280,9 +280,11 @@ while run:
     player.update_animation()
     
     # Update bow
-    arrow = bow.update(player)
+    arrow, firing_direction = bow.update(player)
     if arrow:
         arrow_group.add(arrow)
+    if firing_direction is not None:
+        player.handle_attack_direction(firing_direction)
     
     # Update arrows
     for arrow in arrow_group:

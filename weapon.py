@@ -16,6 +16,7 @@ class Weapon():
     def update(self, player):
         shot_cooldown = 300
         arrow = None
+        firing_direction = None
 
         self.rect.center = player.rect.center
 
@@ -30,11 +31,16 @@ class Weapon():
             arrow = Arrow(self.arrow_image, self.rect.centerx, self.rect.centery, self.angle)
             self.fired = True
             self.last_shot = pygame.time.get_ticks()
+            # Determine firing direction based on mouse position
+            if pos[0] < player.rect.centerx:
+                firing_direction = True # True for flip (face left)
+            else:
+                firing_direction = False # False for no flip (face right)
 
         if not pygame.mouse.get_pressed()[0]:
             self.fired = False
         
-        return arrow
+        return arrow, firing_direction
         
 
     def draw(self, surface):

@@ -1,10 +1,12 @@
 import pygame
 from constants import (
     RED, SPRINT_SPEED_BOOST, SCALE, OFFSET,
-    ANIMATION_COOLDOWN_IDLE, ANIMATION_COOLDOWN_RUN, ANIMATION_COOLDOWN_SPRINT,
+    ANIMATION_COOLDOWN_IDLE, ANIMATION_COOLDOWN_RUN, ANIMATION_COOLDOWN_SPRINT, ATTACK_DIRECTION_COOLDOWN,
     MAX_STAMINA, STAMINA_DEPLETION_RATE, STAMINA_REGEN_IDLE_RATE, STAMINA_REGEN_RUN_RATE,
     STAMINA_COLOR_FULL, STAMINA_COLOR_SPRINTING, STAMINA_COLOR_REGENERATING, STAMINA_COLOR_DEPLETED,
-    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE, SCREEN_WIDTH, SCROLL_THRESH, SCREEN_HEIGHT, ENEMY_SPEED, ENEMY_RANGE # New constants
+    SPRINT_COOLDOWN_DURATION, STAMINA_COLOR_COOLDOWN, TILE_SIZE, SCREEN_WIDTH, SCROLL_THRESH, SCREEN_HEIGHT, ENEMY_SPEED, ENEMY_RANGE, # New constants
+    # UI Feedback constants
+    PLAYER_FLASH_DURATION, PLAYER_FLASH_COLOR
 )
 import math
 
@@ -27,6 +29,7 @@ class Character:
         self.is_alive = True
         self.hit = False
         self.last_hit = pygame.time.get_ticks()
+        self.last_attack_time = 0
         
         # Animation settings
         self.running = False
@@ -75,6 +78,10 @@ class Character:
         if key == pygame.K_LSHIFT:
             self.sprinting = False
 
+    def handle_attack_direction(self, direction):
+        self.last_attack_time = pygame.time.get_ticks()
+        self.flip = direction
+
     def get_movement(self, base_speed):
         dx = 0
         dy = 0
@@ -105,10 +112,13 @@ class Character:
         self.running = False
         if dx != 0 or dy != 0:
             self.running = True
-        if dx < 0:
-            self.flip = True
-        elif dx > 0:
-            self.flip = False
+        
+        # Set player direction based on movement, but only if not in attack cooldown
+        if pygame.time.get_ticks() - self.last_attack_time > ATTACK_DIRECTION_COOLDOWN:
+            if dx < 0:
+                self.flip = True
+            elif dx > 0:
+                self.flip = False
         
        
 
@@ -258,9 +268,25 @@ class Character:
             self.update_time = pygame.time.get_ticks()
 
     def draw(self, surface):
-        flipped_image = pygame.transform.flip(self.image, self.flip, False)
+        image_to_draw = pygame.transform.flip(self.image, self.flip, False)
+
+        # Check if the character is the player and if the flash duration is active
+        if self.char_type == 0 and pygame.time.get_ticks() - self.last_hit < PLAYER_FLASH_DURATION:
+            # Create a copy to avoid modifying the original animation frame
+            image_to_draw = image_to_draw.copy()
+            # Create a red surface to use as a color filter
+            color_surface = pygame.Surface(image_to_draw.get_size()).convert_alpha()
+            color_surface.fill(PLAYER_FLASH_COLOR)
+            
+            # Blend the red color onto the image copy using a MULTIPLY blend mode.
+            # This mode multiplies the color values of each pixel, effectively tinting
+            # the sprite with the specified color while preserving its alpha channel.
+            image_to_draw.blit(color_surface, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+        # Common drawing logic for both player and enemies
         if self.char_type == 0:
-            surface.blit(flipped_image, (self.rect.x, self.rect.y - SCALE * OFFSET))
+            surface.blit(image_to_draw, (self.rect.x, self.rect.y - SCALE * OFFSET))
         else:
-            surface.blit(flipped_image, self.rect)
+            surface.blit(image_to_draw, self.rect)
+            
         pygame.draw.rect(surface, RED, self.rect, 1)
