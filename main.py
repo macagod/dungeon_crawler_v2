@@ -15,6 +15,8 @@ from constants import (
     ROWS, COLS,
     # Screen scroll constants
     SCROLL_THRESH,
+    # UI Feedback constants
+    HEART_WIGGLE_DURATION, HEART_WIGGLE_STRENGTH,
 )
 from weapon import Weapon
 from items import Item
@@ -31,6 +33,8 @@ clock = pygame.time.Clock()
 # Define game variables
 level = 1
 screen_scroll = [0, 0]
+heart_wiggle_active = False
+heart_wiggle_start_time = 0
  
 # Helper function to scale images
 def scale_image(image, scale_factor):
@@ -95,6 +99,24 @@ def draw_text(text, font, text_col, x, y):
 
 # Function for displaying game info
 def draw_info():
+    # --- Heart Wiggle Calculation ---
+    wiggle_offset_x, wiggle_offset_y = 0, 0
+    global heart_wiggle_active, heart_wiggle_start_time # Use global to modify these variables
+
+    if heart_wiggle_active:
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - heart_wiggle_start_time
+
+        if elapsed_time < HEART_WIGGLE_DURATION:
+            # Calculate decay (1.0 at start, 0.0 at end)
+            decay = 1 - (elapsed_time / HEART_WIGGLE_DURATION)
+            # Apply decay to strength
+            current_strength = HEART_WIGGLE_STRENGTH * decay
+            # Generate random offset
+            wiggle_offset_x = random.randint(-int(current_strength), int(current_strength))
+            wiggle_offset_y = random.randint(-int(current_strength), int(current_strength))
+        else:
+            heart_wiggle_active = False # End the wiggle
 
 
     # Draw panel
@@ -103,13 +125,15 @@ def draw_info():
     # Draw hearts
     half_heart_drawn = False
     for i in range(5):
+        heart_x = 10 + (i * (heart_full.get_width() + 5)) + wiggle_offset_x
+        heart_y = 10 + wiggle_offset_y
         if player.health >= ((i + 1) * 20):
-            screen.blit(heart_full, (10 + (i * (heart_full.get_width() + 5)), 10))
+            screen.blit(heart_full, (heart_x, heart_y))
         elif (player.health % 20) > 0 and not half_heart_drawn:
-            screen.blit(heart_half, (10 + (i * (heart_half.get_width() + 5)), 10))
+            screen.blit(heart_half, (heart_x, heart_y))
             half_heart_drawn = True
         else:
-            screen.blit(heart_empty, (10 + (i * (heart_full.get_width() + 5)), 10))
+            screen.blit(heart_empty, (heart_x, heart_y))
 
     # Draw score
     draw_text(f"{player.score}", score_font, WHITE, SCREEN_WIDTH - 695, 20)
@@ -242,6 +266,13 @@ while run:
     for enemy in enemy_list:
         enemy.ai(player, world.obstacle_tiles, screen_scroll)
         enemy.update_animation()
+
+    # --- Check for player getting hit to trigger UI feedback ---
+    if player.hit:
+        heart_wiggle_active = True
+        heart_wiggle_start_time = pygame.time.get_ticks()
+        player.hit = False # Reset the hit flag so it only triggers once
+
     # Update stamina
     player.update_stamina()
 

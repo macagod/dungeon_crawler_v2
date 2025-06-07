@@ -25,6 +25,8 @@ class Character:
         # Health settings
         self.health = health
         self.is_alive = True
+        self.hit = False
+        self.last_hit = pygame.time.get_ticks()
         
         # Animation settings
         self.running = False

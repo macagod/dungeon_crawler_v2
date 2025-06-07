@@ -73,4 +73,8 @@ REGEN_NOTE_FONT_SIZE = 16
 REGEN_NOTE_COLOR = (255, 215, 0)  # Golden
 REGEN_NOTE_PADDING_BOTTOM = 10
 
+# UI Feedback settings
+HEART_WIGGLE_DURATION = 300  # Milliseconds
+HEART_WIGGLE_STRENGTH = 4  # Pixels of maximum offset
+
 
