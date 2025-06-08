@@ -38,6 +38,7 @@ class Character:
         self.frame_index = 0
         self.update_time = pygame.time.get_ticks()
         self.image = self.animation_list[self.action][self.frame_index]
+        self.stunned = False
        
         # Movement state
         self.moving_left = False
@@ -162,6 +163,9 @@ class Character:
 
     def ai(self, player, obstacle_tiles, screen_scroll):
         clipped_line = ()
+
+        stunned_cooldown = 150
+
         ai_dx = 0
         ai_dy = 0
         # Reposition mobs based on screen scroll
@@ -188,15 +192,28 @@ class Character:
                 ai_dy = -ENEMY_SPEED
             if self.rect.centery < player.rect.centery:
                 ai_dy = ENEMY_SPEED
-        self.move(ai_dx, ai_dy, obstacle_tiles)
+            
+        if not self.stunned:
+            self.move(ai_dx, ai_dy, obstacle_tiles)
 
-        # If enemy is within range, attack player
-        if dist < ENEMY_RANGE and not self.hit and pygame.time.get_ticks() - self.last_hit > 1000:
+            # If enemy is within range, attack player
+            if dist < ENEMY_RANGE and not self.hit and pygame.time.get_ticks() - self.last_hit > 1000:
+                self.hit = False
+                self.last_hit = pygame.time.get_ticks()
+                player.health -= 10
+                player.hit = True
+                player.last_hit = pygame.time.get_ticks()
+        
+        # Check if hit
+        if self.hit:
             self.hit = False
             self.last_hit = pygame.time.get_ticks()
-            player.health -= 10
-            player.hit = True
-            player.last_hit = pygame.time.get_ticks()
+            self.stunned = True
+            self.running = False
+            self.update_action(0)
+        
+        if (pygame.time.get_ticks() - self.last_hit > stunned_cooldown):
+            self.stunned = False
 
     def update_stamina(self):
         # 1. Update Cooldown Status

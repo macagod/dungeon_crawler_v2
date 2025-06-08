@@ -82,6 +82,7 @@ class Arrow(pygame.sprite.Sprite):
                 damage = 10 + random.randint(-5, 5)
                 damage_pos = enemy.rect
                 enemy.health -= damage
+                enemy.hit = True
                 self.kill()
                 break
         return damage, damage_pos
