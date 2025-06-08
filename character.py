@@ -9,6 +9,7 @@ from constants import (
     PLAYER_FLASH_DURATION, PLAYER_FLASH_COLOR
 )
 import math
+import weapon
 
 class Character:
     def __init__(self, x, y, health, mob_animations, char_type, size, boss = False):
@@ -29,6 +30,7 @@ class Character:
         self.is_alive = True
         self.hit = False
         self.last_hit = pygame.time.get_ticks()
+        self.last_attack = pygame.time.get_ticks()
         self.last_attack_time = 0
         
         # Animation settings
@@ -161,8 +163,9 @@ class Character:
 
         return screen_scroll
 
-    def ai(self, player, obstacle_tiles, screen_scroll):
+    def ai(self, player, obstacle_tiles, screen_scroll, fireball_image):
         clipped_line = ()
+        fireball = None
 
         stunned_cooldown = 150
 
@@ -205,6 +208,16 @@ class Character:
                     player.health -= 10
                     player.hit = True
                     player.last_hit = pygame.time.get_ticks()
+                # Boss enemy attacks with fireballs
+                fireball_cooldown = 700
+                if self.boss:
+                    if dist < 500:
+                        if pygame.time.get_ticks() - self.last_attack >= fireball_cooldown:
+                            fireball = weapon.Fireball(fireball_image, self.rect.centerx, self.rect.centery, player.rect.centerx, player.rect.centery)
+                            self.last_attack = pygame.time.get_ticks()
+                            
+
+
             
             # Check if hit
             if self.hit:
@@ -216,6 +229,8 @@ class Character:
             
             if (pygame.time.get_ticks() - self.last_hit > stunned_cooldown):
                 self.stunned = False
+
+        return fireball
 
     def update_stamina(self):
         # 1. Update Cooldown Status
@@ -308,4 +323,4 @@ class Character:
         else:
             surface.blit(image_to_draw, self.rect)
             
-        pygame.draw.rect(surface, RED, self.rect, 1)
+        # pygame.draw.rect(surface, RED, self.rect, 1)

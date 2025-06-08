@@ -15,6 +15,9 @@ ENEMY_RANGE = 50
 # Arrow settings
 ARROW_SPEED = 9
 
+# Fireball settings
+FIREBALL_SPEED = 5
+
 # Color settings
 RED = (255, 0, 0)
 BG = (40, 25, 25)
@@ -25,6 +28,7 @@ SCALE = 3
 WEAPON_SCALE = 1.3
 ITEM_SCALE = 3
 POTION_SCALE = 2
+FIREBALL_SCALE = 1
 
 OFFSET = 12
 

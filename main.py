@@ -10,7 +10,7 @@ from constants import (
     # Damage text constants
     DAMAGE_TEXT_FONT_PATH, DAMAGE_TEXT_FONT_SIZE, DAMAGE_TEXT_COLOR, 
     # Item constants
-    ITEM_SCALE, POTION_SCALE,
+    ITEM_SCALE, POTION_SCALE, FIREBALL_SCALE,
     # World constants
     ROWS, COLS,
     # Screen scroll constants
@@ -31,7 +31,7 @@ pygame.display.set_caption("Dungeon Crawler")
 clock = pygame.time.Clock()
 
 # Define game variables
-level = 1
+level = 3
 screen_scroll = [0, 0]
 heart_wiggle_active = False
 heart_wiggle_start_time = 0
@@ -64,6 +64,7 @@ item_images.append(potion_image)
 # Load weapon images
 bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), WEAPON_SCALE)
 arrow_image = scale_image(pygame.image.load("assets/images/weapons/arrow.png").convert_alpha(), WEAPON_SCALE)
+fireball_image = scale_image(pygame.image.load("assets/images/weapons/fireball.png").convert_alpha(), FIREBALL_SCALE)
 
 # Load tile images
 tile_list = []
@@ -217,6 +218,7 @@ bow = Weapon(bow_image, arrow_image)
 damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
+fireball_group = pygame.sprite.Group()
 
 score_coin = Item(SCREEN_WIDTH - 710, 30, -1, coin_images)
 item_group.add(score_coin)
@@ -264,8 +266,11 @@ while run:
     world.update(screen_scroll)
     # Update enemy
     for enemy in enemy_list:
-        enemy.ai(player, world.obstacle_tiles, screen_scroll)
-        enemy.update_animation()
+        fireball = enemy.ai(player, world.obstacle_tiles, screen_scroll, fireball_image)
+        if fireball:
+            fireball_group.add(fireball)
+        if enemy.is_alive:
+            enemy.update_animation()
 
     # --- Check for player getting hit to trigger UI feedback ---
     if player.hit:
@@ -293,7 +298,8 @@ while run:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), DAMAGE_TEXT_COLOR)
             damage_text_group.add(damage_text)
 
-    
+    # Update fireballs
+    fireball_group.update(player, screen_scroll)
     # Update damage text
     damage_text_group.update(screen_scroll)
 
@@ -310,6 +316,8 @@ while run:
     bow.draw(screen)
     for arrow in arrow_group: # Draw arrows
         arrow.draw(screen)
+    for fireball in fireball_group: # Draw fireballs
+        fireball.draw(screen)
     for enemy in enemy_list: # Draw enemies
         enemy.draw(screen)
     
