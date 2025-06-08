@@ -288,7 +288,7 @@ while run:
     
     # Update arrows
     for arrow in arrow_group:
-        damage, damage_pos = arrow.update(enemy_list, screen_scroll)
+        damage, damage_pos = arrow.update(world.obstacle_tiles, enemy_list, screen_scroll)
         if damage != 0:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), DAMAGE_TEXT_COLOR)
             damage_text_group.add(damage_text)

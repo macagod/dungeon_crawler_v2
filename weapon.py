@@ -61,7 +61,7 @@ class Arrow(pygame.sprite.Sprite):
         self.dx = math.cos(math.radians(self.angle)) * ARROW_SPEED
         self.dy = math.sin(math.radians(self.angle)) * ARROW_SPEED * -1 # PyGame uses inverted Y-axis
 
-    def update(self, enemy_list, screen_scroll):
+    def update(self, obstacle_tiles, enemy_list, screen_scroll):
         # Reposition based on screen scroll
         self.rect.x += screen_scroll[0] + self.dx
         self.rect.y += screen_scroll[1] + self.dy
@@ -70,6 +70,12 @@ class Arrow(pygame.sprite.Sprite):
         # Reposition based on velocity
         # self.rect.x += self.dx
         # self.rect.y += self.dy
+
+        # Check if arrow is colliding with obstacle tiles
+        for tile in obstacle_tiles:
+            if tile[1].colliderect(self.rect):
+                self.kill()
+                break
 
         # Check if arrow is off screen
         if self.rect.x < 0 or self.rect.x > SCREEN_WIDTH or self.rect.y < 0 or self.rect.y > SCREEN_HEIGHT:

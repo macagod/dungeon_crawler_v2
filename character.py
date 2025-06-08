@@ -193,27 +193,29 @@ class Character:
             if self.rect.centery < player.rect.centery:
                 ai_dy = ENEMY_SPEED
             
-        if not self.stunned:
-            self.move(ai_dx, ai_dy, obstacle_tiles)
+        # If still alive
+        if self.is_alive:
+            if not self.stunned:
+                self.move(ai_dx, ai_dy, obstacle_tiles)
 
-            # If enemy is within range, attack player
-            if dist < ENEMY_RANGE and not self.hit and pygame.time.get_ticks() - self.last_hit > 1000:
+                # If enemy is within range, attack player
+                if dist < ENEMY_RANGE and not self.hit and pygame.time.get_ticks() - self.last_hit > 1000:
+                    self.hit = False
+                    self.last_hit = pygame.time.get_ticks()
+                    player.health -= 10
+                    player.hit = True
+                    player.last_hit = pygame.time.get_ticks()
+            
+            # Check if hit
+            if self.hit:
                 self.hit = False
                 self.last_hit = pygame.time.get_ticks()
-                player.health -= 10
-                player.hit = True
-                player.last_hit = pygame.time.get_ticks()
-        
-        # Check if hit
-        if self.hit:
-            self.hit = False
-            self.last_hit = pygame.time.get_ticks()
-            self.stunned = True
-            self.running = False
-            self.update_action(0)
-        
-        if (pygame.time.get_ticks() - self.last_hit > stunned_cooldown):
-            self.stunned = False
+                self.stunned = True
+                self.running = False
+                self.update_action(0)
+            
+            if (pygame.time.get_ticks() - self.last_hit > stunned_cooldown):
+                self.stunned = False
 
     def update_stamina(self):
         # 1. Update Cooldown Status
