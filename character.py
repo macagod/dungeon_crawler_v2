@@ -109,7 +109,9 @@ class Character:
             dy *= (math.sqrt(2) / 2)
         return dx, dy
 
-    def move(self, dx, dy, obstacle_tiles):
+    def move(self, dx, dy, obstacle_tiles, exit_tile=None):
+        # Check if level complete
+        level_complete = False
         # Screen scroll
         screen_scroll = [0, 0]
         self.running = False
@@ -145,6 +147,15 @@ class Character:
 
         # Scroll logic only applies to player
         if self.char_type == 0:
+
+            # Check if player has reached exit tile
+            if exit_tile[1].colliderect(self.rect):
+                # Ensure player is at the center of the exit tile
+                exit_dist = math.sqrt((self.rect.centerx - exit_tile[1].centerx)**2 + (self.rect.centery - exit_tile[1].centery)**2)
+                if exit_dist < 10:
+                    level_complete = True
+                    print("Level complete")
+
             # Update scroll based on player position
             # Move camera left and right
             if self.rect.right > SCREEN_WIDTH - SCROLL_THRESH:
@@ -161,7 +172,7 @@ class Character:
                 screen_scroll[1] = SCROLL_THRESH - self.rect.top
                 self.rect.top = SCROLL_THRESH
 
-        return screen_scroll
+        return screen_scroll, level_complete
 
     def ai(self, player, obstacle_tiles, screen_scroll, fireball_image):
         clipped_line = ()

@@ -31,7 +31,7 @@ pygame.display.set_caption("Dungeon Crawler")
 clock = pygame.time.Clock()
 
 # Define game variables
-level = 3
+level = 1
 screen_scroll = [0, 0]
 heart_wiggle_active = False
 heart_wiggle_start_time = 0
@@ -100,6 +100,7 @@ def draw_text(text, font, text_col, x, y):
 
 # Function for displaying game info
 def draw_info():
+
     # --- Heart Wiggle Calculation ---
     wiggle_offset_x, wiggle_offset_y = 0, 0
     global heart_wiggle_active, heart_wiggle_start_time # Use global to modify these variables
@@ -141,27 +142,21 @@ def draw_info():
     # Draw Level
     draw_text(f"Level: {level}", score_font, WHITE, 400, 20)
 
-# Create empty tile list
-world_data = []
-for row in range(ROWS):
-    r = [-1] * COLS
-    world_data.append(r)
-
-# Load in level data
-with open(f"levels/level{level}_data.csv", newline="") as csvfile:
-    reader = csv.reader(csvfile, delimiter=",")
-    for x, row in enumerate(reader):
-        for y, tile in enumerate(row):
-            world_data[x][y] = int(tile)
-
-
-# Create world object
-world = World()
-world.process_data(world_data, tile_list, item_images, mob_animations)
-
-# create player
-player = world.player
-
+# Function to reset level
+def reset_level():
+    damage_text_group.empty()
+    arrow_group.empty()
+    item_group.empty()
+    fireball_group.empty()
+    
+    # Create empty tile list
+    data = []
+    for row in range(ROWS):
+        r = [-1] * COLS
+        data.append(r)
+    
+    return data
+    
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
     def __init__(self, x, y, damage, color):
@@ -206,6 +201,28 @@ class DamageText(pygame.sprite.Sprite):
         # Remove the damage text when it's fully faded out
         if self.alpha <= 0:
             self.kill()
+
+
+# Create empty tile list
+world_data = []
+for row in range(ROWS):
+    r = [-1] * COLS
+    world_data.append(r)
+
+# Load in level data
+with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+    reader = csv.reader(csvfile, delimiter=",")
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            world_data[x][y] = int(tile)
+
+
+# Create world object
+world = World()
+world.process_data(world_data, tile_list, item_images, mob_animations)
+
+# create player
+player = world.player
 
 
 
@@ -259,7 +276,7 @@ while run:
     
     # Calculate player movement
     dx, dy = player.get_movement(SPEED)
-    screen_scroll = player.move(dx, dy, world.obstacle_tiles)
+    screen_scroll, level_complete = player.move(dx, dy, world.obstacle_tiles, world.exit_tile)
  
 
     # Update world
@@ -369,6 +386,42 @@ while run:
         note_rect.centerx = SCREEN_WIDTH / 2
         note_rect.bottom = SCREEN_HEIGHT - REGEN_NOTE_PADDING_BOTTOM
         screen.blit(note_surface, note_rect)
+
+    # Check if level is complete
+    if level_complete:
+        level += 1
+        world_data = reset_level()
+        
+        # Load level data and create world
+        # Load in level data
+        with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter=",")
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    world_data[x][y] = int(tile)
+        world = World()
+        world.process_data(world_data, tile_list, item_images, mob_animations)
+
+        # Retain player health and score
+        temp_health = player.health
+        temp_score = player.score
+        
+        # Reset player and enemy list
+        player = world.player
+
+        player.health = temp_health    # Retain player health
+        player.score = temp_score      # Retain player score
+        enemy_list = []
+        enemy_list.extend(world.enemy_list)
+
+        score_coin = Item(SCREEN_WIDTH - 710, 30, -1, coin_images)
+        item_group.add(score_coin)
+
+        # Add items from level data
+        for item in world.item_list:
+            item_group.add(item)
+
+        
 
     # Event handling
     for event in pygame.event.get():
